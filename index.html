@@ -134,16 +134,48 @@ footer{background:#020617;color:#64748b;padding:64px 48px 32px}
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-inner">
-    <div>
-      <div class="hero-badge">Institutional Grade. Retail Access.</div>
-      <h1>Invest and grow your crypto wealth today.</h1>
-      <p>Stargicinvestment provides premium tools, institutional liquidity, and unparalleled security for serious investors ready to take the next step.</p>
-      <div class="hero-btns">
-        <a href="#how" class="btn-primary">Get Started</a>
-        <a href="#features" class="btn-outline">Learn More</a>
-      </div>
-    </div>
+
+<div class="hero-text">
+
+<h1>
+Smart <span>Digital Investment</span> Platform
+</h1>
+
+<p>
+Grow your future through agriculture, real estate, oil & gas, and global business investments.
+</p>
+
+</div>
+
+<div class="hero-slider">
+
+<div class="slide active">
+<video autoplay muted loop playsinline>
+<source src="vid-agriculture.mp4" type="video/mp4">
+</video>
+</div>
+
+<div class="slide">
+<video autoplay muted loop playsinline>
+<source src="vid-bussiness.mp4" type="video/mp4">
+</video>
+</div>
+
+<div class="slide">
+<video autoplay muted loop playsinline>
+<source src="vid-oilgas.mp4" type="video/mp4">
+</video>
+</div>
+
+<div class="slide">
+<video autoplay muted loop playsinline>
+<source src="vid-realestate.mp4" type="video/mp4">
+</video>
+</div>
+
+</div>
+
+</section>
     <div class="hero-person">
       <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAQACAYAAAB/HSuDAAEAAElEQVR4nIz9y5LsOKwsCjrIyH0/
 s9t61Nb/PzorRPQAcNAJMWofla3KzAiJIkG8X7T/1//7/wMzA9zjJxYAwPCH+CX+HgNYa8HMYGZw
@@ -24798,5 +24830,25 @@ document.querySelectorAll('.card,.step').forEach((el,i)=>{
   obs.observe(el);
 });
 </script>
+
+  <script>
+
+const slides = document.querySelectorAll('.slide');
+
+let currentSlide = 0;
+
+function showNextSlide(){
+
+slides[currentSlide].classList.remove('active');
+
+currentSlide = (currentSlide + 1) % slides.length;
+
+slides[currentSlide].classList.add('active');
+
+}
+
+setInterval(showNextSlide, 6000);
+
+  </script>
 </body>
 </html>
