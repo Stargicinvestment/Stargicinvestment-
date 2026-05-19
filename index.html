@@ -132,15 +132,11 @@ footer{background:#020617;color:#64748b;padding:64px 48px 32px}
   </div>
 </header>
 
-
-<!-- FULLSCREEN VIDEO HERO -->
-
 <section style="
 position:relative;
 width:100%;
 height:100vh;
 overflow:hidden;
-background:black;
 ">
 
 <!-- REAL ESTATE -->
@@ -149,24 +145,15 @@ background:black;
 position:absolute;
 inset:0;
 opacity:1;
-transition:1.5s ease-in-out;
+transition:1s;
 ">
 
-<video
-autoplay
-muted
-loop
-playsinline
-preload="auto"
-webkit-playsinline
-style="
+<video autoplay muted loop playsinline style="
 width:100%;
 height:100%;
-object-fit:contain;
-background:black;
-"
->
-<source src="./vid-realestate.mp4" type="video/mp4">
+object-fit:cover;
+">
+<source src="vid-realestate.mp4" type="video/mp4">
 </video>
 
 <div style="
@@ -235,24 +222,15 @@ Start Investing →
 position:absolute;
 inset:0;
 opacity:0;
-transition:1.5s ease-in-out;
+transition:1s;
 ">
 
-<video
-autoplay
-muted
-loop
-playsinline
-preload="auto"
-webkit-playsinline
-style="
+<video autoplay muted loop playsinline style="
 width:100%;
 height:100%;
-object-fit:contain;
-background:black;
-"
->
-<source src="./vid-agriculture.mp4" type="video/mp4">
+object-fit:cover;
+">
+<source src="vid-agriculture.mp4" type="video/mp4">
 </video>
 
 <div style="
@@ -321,24 +299,15 @@ Start Investing →
 position:absolute;
 inset:0;
 opacity:0;
-transition:1.5s ease-in-out;
+transition:1s;
 ">
 
-<video
-autoplay
-muted
-loop
-playsinline
-preload="auto"
-webkit-playsinline
-style="
+<video autoplay muted loop playsinline style="
 width:100%;
 height:100%;
-object-fit:contain;
-background:black;
-"
->
-<source src="./vid-bussiness.mp4" type="video/mp4">
+object-fit:cover;
+">
+<source src="vid-bussiness.mp4" type="video/mp4">
 </video>
 
 <div style="
@@ -407,24 +376,15 @@ Start Investing →
 position:absolute;
 inset:0;
 opacity:0;
-transition:1.5s ease-in-out;
+transition:1s;
 ">
 
-<video
-autoplay
-muted
-loop
-playsinline
-preload="auto"
-webkit-playsinline
-style="
+<video autoplay muted loop playsinline style="
 width:100%;
 height:100%;
-object-fit:contain;
-background:black;
-"
->
-<source src="./vid-oilgas.mp4" type="video/mp4">
+object-fit:cover;
+">
+<source src="vid-oilgas.mp4" type="video/mp4">
 </video>
 
 <div style="
@@ -488,6 +448,8 @@ Start Investing →
 </div>
 
 </section>
+
+
 
 <div class="hero-person">
       <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAQACAYAAAB/HSuDAAEAAElEQVR4nIz9y5LsOKwsCjrIyH0/
@@ -25160,7 +25122,7 @@ slides[currentSlide].style.opacity = "1";
 
 }
 
-setInterval(showNextSlide, 8000);
+setInterval(showNextSlide, 6000);
 
 </script>
 </body>
