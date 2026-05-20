@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secure Payment</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Poppins, sans-serif;
+  background: radial-gradient(circle at top, #0f3d2e, #050505 70%);
+  color:#fff;
+  text-align:center;
+  padding:20px;
+}
+
+.coin-img{
+  width:90px;
+  margin-top:25px;
+}
+
+.title{
+  margin-top:15px;
+  font-size:18px;
+  color:#aaa;
+}
+
+.amount{
+  font-size:34px;
+  color:#00ffae;
+  margin:10px 0;
+  font-weight:600;
+}
+
+.qr{
+  width:260px;
+  height:260px;
+  margin:25px auto;
+  border-radius:12px;
+  background:#fff;
+  padding:10px;
+}
+
+.wallet{
+  background:#111;
+  padding:15px;
+  border-radius:10px;
+  word-break:break-all;
+  margin-top:15px;
+  font-size:13px;
+}
+
+.note{
+  margin-top:8px;
+  font-size:13px;
+  color:#ffcc00;
+}
+
+.copy-btn{
+  margin-top:15px;
+  padding:14px 25px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  background:linear-gradient(135deg,#00ffae,#00c3ff);
+  color:#000;
+  font-weight:600;
+}
+</style>
+</head>
+
+<body>
+
+<img id="coinImage" class="coin-img">
+
+<div class="title" id="titleText"></div>
+<div class="amount" id="amountText"></div>
+
+<img id="qrCode" class="qr">
+
+<div class="wallet" id="wallet"></div>
+<div class="note" id="networkNote"></div>
+
+<button class="copy-btn" onclick="copyWallet()">Copy Address</button>
+
+<script>
+
+const params = new URLSearchParams(window.location.search);
+const coin = params.get("coin");
+const amount = params.get("amount");
+
+// WALLET ADDRESSES
+const wallets = {
+  "Bitcoin (BTC)": {
+    address: "bc1qjp23ze4y9l3adretjjkgwp8ysllx50fmknckaf",
+    note: "Send ONLY BTC network",
+    qrPrefix: "bitcoin:"
+  },
+
+  "Ethereum (ETH)": {
+    address: "0x7e0fEcb39B9560D9B9E57aFC7C4FFDA4dC213f8F",
+    note: "Send ONLY Ethereum (ERC20)",
+    qrPrefix: "ethereum:"
+  },
+
+  "USDT (BSC)": {
+    address: "0x7e0fEcb39B9560D9B9E57aFC7C4FFDA4dC213f8F",
+    note: "Send ONLY BSC (BEP20)",
+    qrPrefix: "binance:"
+  },
+
+  "XRP": {
+    address: "rhBjDbWEjZM4RfTnXQApF4CWncEpbJrzBN",
+    note: "Send ONLY XRP network",
+    qrPrefix: "ripple:"
+  }
+};
+
+// IMAGES
+const images = {
+  "Bitcoin (BTC)": "https://cdn.jsdelivr.net/gh/spothq/cryptocurrency-icons@master/128/color/btc.png",
+  "Ethereum (ETH)": "https://cdn.jsdelivr.net/gh/spothq/cryptocurrency-icons@master/128/color/eth.png",
+  "USDT (BSC)": "https://cdn.jsdelivr.net/gh/spothq/cryptocurrency-icons@master/128/color/usdt.png",
+  "XRP": "https://cdn.jsdelivr.net/gh/spothq/cryptocurrency-icons@master/128/color/xrp.png"
+};
+
+const coinImage = document.getElementById("coinImage");
+const titleText = document.getElementById("titleText");
+const amountText = document.getElementById("amountText");
+const walletBox = document.getElementById("wallet");
+const qrCode = document.getElementById("qrCode");
+const networkNote = document.getElementById("networkNote");
+
+if (!coin || !amount || !wallets[coin]) {
+  titleText.textContent = "Invalid payment request";
+  throw new Error("Invalid payment data");
+}
+
+const walletData = wallets[coin];
+
+// DISPLAY
+coinImage.src = images[coin];
+titleText.textContent = `Deposit ${coin}`;
+amountText.textContent = `$${amount}`;
+walletBox.textContent = walletData.address;
+networkNote.textContent = walletData.note;
+
+// QR BUILD (FIXED)
+let qrData = walletData.address;
+
+if (walletData.qrPrefix === "bitcoin:") {
+  qrData = `bitcoin:${walletData.address}?amount=${amount}`;
+}
+
+if (walletData.qrPrefix === "ethereum:") {
+  qrData = `ethereum:${walletData.address}?value=${amount}`;
+}
+
+if (walletData.qrPrefix === "binance:") {
+  qrData = walletData.address; // BEP20 uses raw address QR
+}
+
+if (walletData.qrPrefix === "ripple:") {
+  qrData = `ripple:${walletData.address}?amount=${amount}`;
+}
+
+// QR IMAGE
+qrCode.src = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(qrData)}`;
+
+  function copyWallet() {
+  const address = document.getElementById("wallet").textContent;
+
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(address)
+      .then(() => alert("Wallet copied"))
+      .catch(() => fallbackCopy(address));
+  } else {
+    fallbackCopy(address);
+  }
+  }
+</script>
+
+</body>
+  </html>
