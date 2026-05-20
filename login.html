@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
+
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+}
+
+/* CARD */
+.card{
+  width:90%;
+  max-width:400px;
+  padding:30px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(15px);
+  box-shadow:0 8px 32px rgba(0,0,0,0.3);
+  border:1px solid rgba(255,255,255,0.1);
+  color:#fff;
+  text-align:center;
+}
+
+/* TITLE */
+.title{
+  font-size:26px;
+  margin-bottom:20px;
+  font-weight:bold;
+}
+
+/* INPUT */
+.input-group{
+  margin-bottom:15px;
+}
+
+.input-group input{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  background:rgba(255,255,255,0.1);
+  color:#fff;
+}
+
+/* BUTTON */
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(45deg,#00c853,#69f0ae);
+  color:#000;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* LINK */
+.register{
+  margin-top:15px;
+  font-size:13px;
+}
+
+.register a{
+  color:#69f0ae;
+  text-decoration:none;
+}
+
+  /* ===== TRANSLATE CONTAINER ===== */
+.translate-box{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#111827;
+  padding:6px 10px;
+  border-radius:8px;
+  border:1px solid #1f2937;
+}
+
+/* ICON */
+.translate-box i{
+  color:#00ff9d;
+  font-size:14px;
+}
+
+/* DROPDOWN */
+.goog-te-combo{
+  background:transparent !important;
+  color:#00ff9d !important;
+  border:none !important;
+  font-size:13px;
+  outline:none;
+  cursor:pointer;
+}
+
+/* REMOVE GOOGLE BRANDING */
+.goog-logo-link,
+.goog-te-gadget span{
+  display:none !important;
+}
+
+.goog-te-gadget{
+  color:transparent !important;
+}
+
+/* HIDE TOP BAR */
+.goog-te-banner-frame.skiptranslate{
+  display:none !important;
+}
+
+body{
+  top:0px !important;
+}
+
+/* SMOOTH HOVER */
+.translate-box:hover{
+  border-color:#00ff9d;
+  box-shadow:0 0 10px rgba(0,255,157,0.2);
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <div class="title">Login</div>
+
+  <div class="input-group">
+    <input type="email" id="email" placeholder="Email Address">
+  </div>
+
+  <div class="input-group">
+    <input type="password" id="password" placeholder="Password">
+  </div>
+
+  <button onclick="login()" id="loginBtn">Login</button>
+
+  <div class="register">
+    Don't have account? <a href="register.html">Register</a>
+  </div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// ✅ SAME CONFIG AS REGISTER
+const firebaseConfig = {
+  apiKey: "AIzaSyDGsQ3Q7JHVvNlKAQi3l5HSZBZrP_fVoBk",
+  authDomain: "stargicinvestment.firebaseapp.com",
+  projectId: "stargicinvestment",
+  storageBucket: "stargicinvestment.appspot.com",
+  messagingSenderId: "1053305294931",
+  appId: "1:1053305294931:web:87cba3260a83030e56f6a6"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+window.login = async function(){
+
+  const btn = document.getElementById("loginBtn");
+  btn.disabled = true;
+  btn.innerText = "Logging in...";
+
+  try{
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    if(!email || !password){
+      alert("Enter email and password");
+      btn.disabled = false;
+      btn.innerText = "Login";
+      return;
+    }
+
+    const userCred = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCred.user;
+
+    // 🔥 CHECK ADMIN ROLE
+    const userRef = doc(db,"users",user.uid);
+    const snap = await getDoc(userRef);
+
+    if(!snap.exists()){
+      alert("User data not found");
+      return;
+    }
+
+    const data = snap.data();
+
+    if(data.admin === true){
+      // ✅ ADMIN REDIRECT
+      location.href = "admin.html";
+    }else{
+      // ✅ NORMAL USER
+      location.href = "dashboard.html";
+    }
+
+  }catch(err){
+    console.error(err);
+
+    if(err.code === "auth/invalid-credential"){
+      alert("Invalid email or password");
+    }else{
+      alert("Login failed");
+    }
+  }
+
+  btn.disabled = false;
+  btn.innerText = "Login";
+};
+
+</script>
+
+  <script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+</script>
+
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+  </html>
