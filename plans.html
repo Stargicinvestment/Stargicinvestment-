@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Make Deposit</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Poppins, sans-serif;
+  background: radial-gradient(circle at top, #0f3d2e, #050505 70%);
+  color:#fff;
+}
+
+/* CONTAINER */
+.container{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
+
+/* CARD */
+.deposit-box{
+  width:100%;
+  max-width:400px;
+  background:rgba(255,255,255,0.03);
+  border-radius:20px;
+  padding:25px;
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,0.05);
+  box-shadow:0 20px 60px rgba(0,0,0,0.8);
+}
+
+.deposit-box h2{ margin-bottom:10px; }
+.deposit-box p{ color:#aaa; margin-bottom:25px; }
+
+label{
+  display:block;
+  margin-bottom:8px;
+  font-size:14px;
+}
+
+select, input{
+  width:100%;
+  padding:16px;
+  border-radius:10px;
+  border:none;
+  background:#1a1f2e;
+  color:#fff;
+  margin-bottom:20px;
+  font-size:15px;
+  box-sizing:border-box;
+}
+
+button{
+  width:100%;
+  padding:16px;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+  cursor:pointer;
+  background:linear-gradient(135deg,#00ffae,#00c3ff);
+  color:#000;
+  transition:0.3s;
+}
+
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 30px rgba(0,255,174,0.3);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="deposit-box">
+
+    <h2>Make Deposit</h2>
+    <p>Minimum Deposit: $200</p>
+
+    <form id="depositForm">
+
+      <label>Currency *</label>
+      <select id="currency">
+        <option value="">Choose Currency</option>
+        <option>Bitcoin (BTC)</option>
+        <option>Ethereum (ETH)</option>
+        <option>USDT (BSC)</option>
+        <option>XRP</option>
+      </select>
+
+      <label>Enter Amount *</label>
+      <input type="number" id="amount" placeholder="0000.00">
+
+      <button type="submit">Make Deposit</button>
+
+    </form>
+
+  </div>
+</div>
+
+<script>
+document.getElementById("depositForm").addEventListener("submit", function(e){
+  e.preventDefault();
+
+  const currency = document.getElementById("currency").value;
+  const amount = document.getElementById("amount").value;
+
+  if(!currency){
+    alert("Select currency");
+    return;
+  }
+
+  if(!amount || amount < 200){
+    alert("Minimum deposit is $200");
+    return;
+  }
+
+  window.location.href = `payment.html?coin=${encodeURIComponent(currency)}&amount=${amount}`;
+});
+</script>
+
+</body>
+  </html>
