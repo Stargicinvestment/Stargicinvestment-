@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+body{
+  background:#0b0f1a;
+  color:#fff;
+  padding:16px;
+}
+
+.container{
+  max-width:420px;
+  margin:auto;
+  padding-bottom:30px;
+}
+
+/* HEADER */
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+}
+
+.avatar{
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid #2d2cff;
+}
+
+.menu{
+  font-size:26px;
+}
+
+/* TEXT */
+
+.small{
+  font-size:12px;
+  color:#aaa;
+}
+
+.balance{
+  font-size:36px;
+  font-weight:700;
+  color:#00ff9d;
+  margin-top:8px;
+}
+
+.profit{
+  font-size:22px;
+  font-weight:700;
+  color:gold;
+}
+
+/* CARD */
+
+.card{
+  background:#111827;
+  padding:16px;
+  border-radius:16px;
+  margin-top:16px;
+}
+
+/* BUTTONS */
+
+.actions{
+  display:flex;
+  gap:10px;
+}
+
+button{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.deposit{
+  background:#2d2cff;
+  color:white;
+}
+
+.withdraw{
+  background:#ff2d55;
+  color:white;
+}
+
+/* CRYPTO */
+
+.crypto{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.coin{
+  background:#0b1030;
+  padding:12px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:14px;
+}
+
+.coin img{
+  width:24px;
+  height:24px;
+}
+
+/* INPUT */
+
+input{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  outline:none;
+}
+
+/* TX */
+
+.tx{
+  background:#0b1030;
+  padding:12px;
+  border-radius:12px;
+  margin-top:10px;
+}
+
+.tx-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.history-box{
+  max-height:250px;
+  overflow-y:auto;
+}
+  body, * {
+  -webkit-user-select: none; /* Chrome / Safari */
+  -ms-user-select: none;     /* IE/Edge */
+  user-select: none;         /* Standard */
+  }
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+
+    <div class="brand" onclick="openUpload()">
+
+      <img
+        id="avatar"
+        class="avatar"
+        src="https://i.imgur.com/6VBx3io.png"
+      >
+
+      <div>
+  <b id="welcomeText">Welcome 👋</b>
+      </div>
+
+    </div>
+<div class="menu">
+  <a href="settings.html"
+     style="
+       color:white;
+       text-decoration:none;
+       font-size:16px;
+       background:#2d2cff;
+       padding:8px 14px;
+       border-radius:8px;
+     ">
+     Settings
+  </a>
+</div>
+
+  </div>
+
+  <!-- BALANCE -->
+  <div>Account Balance</div>
+
+  <div id="balance" class="balance">
+    $0.00
+  </div>
+
+  <!-- INVESTED -->
+  <div
+    id="capitalBox"
+    class="card"
+    style="display:none;"
+  >
+
+    <div>Capital Locked</div>
+
+    <div
+      id="invested"
+      style="
+      color:#00ff9d;
+      font-size:22px;
+      font-weight:700;
+      margin-top:8px;
+      "
+    >
+      $0.00
+    </div>
+
+  </div>
+
+  <!-- PROFIT -->
+  <div
+    id="profitBox"
+    class="card"
+    style="display:none;"
+  >
+
+    <div>Profit</div>
+
+    <div
+      id="profit"
+      class="profit"
+    >
+      $0.00
+    </div>
+
+    <div
+      id="locked"
+      class="small"
+      style="margin-top:8px;"
+    >
+    </div>
+
+  </div>
+
+  <!-- CRYPTO -->
+  <div class="card crypto">
+
+    <div class="coin">
+      <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png">
+      <div>
+        <div>BTC</div>
+        <b id="btc">$0</b>
+      </div>
+    </div>
+
+    <div class="coin">
+      <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png">
+      <div>
+        <div>ETH</div>
+        <b id="eth">$0</b>
+      </div>
+    </div>
+
+    <div class="coin">
+      <img src="https://cryptologos.cc/logos/tether-usdt-logo.png">
+      <div>
+        <div>USDT</div>
+        <b id="usdt">$0</b>
+      </div>
+    </div>
+
+    <div class="coin">
+      <img src="https://cryptologos.cc/logos/xrp-xrp-logo.png">
+      <div>
+        <div>XRP</div>
+        <b id="xrp">$0</b>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="card actions">
+
+    <button
+      class="deposit"
+      onclick="goDeposit()"
+    >
+      Deposit
+    </button>
+
+    <button
+      class="withdraw"
+      onclick="goWithdraw()"
+    >
+      Withdraw
+    </button>
+
+  </div>
+
+  <!-- REF -->
+  <div class="card">
+
+    <div>Referral Link</div>
+
+    <input
+      id="ref"
+      readonly
+    >
+
+    <button
+      onclick="copyRef()"
+      style="
+      margin-top:10px;
+      width:100%;
+      background:#2d2cff;
+      color:white;
+      "
+    >
+      Copy Referral
+    </button>
+
+  </div>
+
+  <!-- TRANSACTIONS -->
+  <div class="card">
+
+    <h3>Transactions</h3>
+
+    <div
+      id="history"
+      class="history-box"
+    ></div>
+
+  </div>
+
+  <!-- WITHDRAWS -->
+  <div class="card">
+
+    <h3>Withdraw Requests</h3>
+
+    <div
+      id="withdrawHistory"
+      class="history-box"
+    ></div>
+
+  </div>
+
+</div>
+
+<!-- FILE INPUT -->
+<input
+  type="file"
+  id="file"
+  hidden
+>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  onSnapshot
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+/* FIREBASE */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDGsQ3Q7JHVvNlKAQi3l5HSZBZrP_fVoBk",
+  authDomain: "stargicinvestment.firebaseapp.com",
+  projectId: "stargicinvestment",
+  storageBucket: "stargicinvestment.appspot.com",
+  messagingSenderId: "1053305294931",
+  appId: "1:1053305294931:web:87cba3260a83030e56f6a6"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+/* ELEMENTS */
+
+const balanceEl = document.getElementById("balance");
+const investedEl = document.getElementById("invested");
+const capitalBox = document.getElementById("capitalBox");
+
+const profitBox = document.getElementById("profitBox");
+const profitEl = document.getElementById("profit");
+const lockedEl = document.getElementById("locked");
+
+const avatar = document.getElementById("avatar");
+const fileInput = document.getElementById("file");
+
+const historyEl = document.getElementById("history");
+const withdrawEl = document.getElementById("withdrawHistory");
+
+const refInput = document.getElementById("ref");
+
+let currentUser = null;
+let miningRunning = false;
+
+/* PLANS */
+
+const plans = {
+  Basic:{rate:0.02,duration:7},
+  Silver:{rate:0.025,duration:7},
+  Elite:{rate:0.03,duration:7},
+  Premium:{rate:0.035,duration:7},
+  VIP:{rate:0.04,duration:7}
+};
+
+/* LIVE COIN PRICES */
+
+async function loadPrices(){
+
+  try{
+
+    const r = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether,ripple&vs_currencies=usd"
+    );
+
+    const d = await r.json();
+
+    document.getElementById("btc").innerText =
+      "$"+d.bitcoin.usd.toLocaleString();
+
+    document.getElementById("eth").innerText =
+      "$"+d.ethereum.usd.toLocaleString();
+
+    document.getElementById("usdt").innerText =
+      "$"+d.tether.usd.toLocaleString();
+
+    document.getElementById("xrp").innerText =
+      "$"+d.ripple.usd.toLocaleString();
+
+  }catch(e){
+    console.log(e);
+  }
+}
+
+loadPrices();
+setInterval(loadPrices,30000);
+
+/* MINING */
+
+async function runMining(userRef){
+
+  const snap = await getDoc(userRef);
+
+  if(!snap.exists()) return;
+
+  const data = snap.data();
+
+  let invested =
+    Number(data.invested)||0;
+
+  if(invested<=0) return;
+
+  if(!data.plan) return;
+
+  const plan = plans[data.plan];
+
+  if(!plan) return;
+
+  let now = Date.now();
+
+  let last =
+    Number(data.lastUpdate)||now;
+
+  let lockedProfit =
+    Number(data.lockedProfit)||0;
+
+  let profitStart =
+    Number(data.profitStart)||now;
+
+  let days =
+    (now-profitStart)/(1000*60*60*24);
+
+  /* UNLOCK */
+
+  if(days>=7 && lockedProfit>0){
+
+    await updateDoc(userRef,{
+
+      availableProfit:
+        (Number(data.availableProfit)||0)
+        + lockedProfit,
+
+      lockedProfit:0,
+      profitStart:Date.now()
+
+    });
+
+    return;
+  }
+
+  let hours =
+    (now-last)/(1000*60*60);
+
+  let earned =
+    invested*plan.rate*(hours/24);
+
+  if(!isFinite(earned)||earned<=0) return;
+
+  await updateDoc(userRef,{
+
+    lockedProfit:
+      (Number(data.lockedProfit)||0)
+      + earned,
+
+    lastUpdate:now
+
+  });
+}
+
+/* START MINING */
+
+function startMining(user){
+
+  if(miningRunning) return;
+
+  miningRunning = true;
+
+  const userRef =
+    doc(db,"users",user.uid);
+
+  runMining(userRef);
+
+  setInterval(()=>{
+    runMining(userRef);
+  },60000);
+
+  setTimeout(()=>{
+    runMining(userRef);
+  },2000);
+}
+
+/* AUTH */
+
+onAuthStateChanged(auth,async(user)=>{
+
+  if(!user){
+
+    location.href="login.html";
+    return;
+  }
+
+  currentUser = user;
+
+  startMining(user);
+
+  const userRef =
+    doc(db,"users")
+
+  /* REF LINK */
+
+  refInput.value =
+    `https://stargicinvestment.github.io/Stargicinvestment`;
+
+  /* USER DATA */
+
+  onSnapshot(userRef,(snap)=>{
+
+    if(!snap.exists()) return;
+
+    const d = snap.data();
+    document.getElementById("welcomeText").innerText =
+  "Welcome, " + (d.fullName || d.name || "User");
+
+    const balance =
+      Number(d.balance)||0;
+
+    const invested =
+      Number(d.invested)||0;
+
+    const availableProfit =
+      Number(d.availableProfit)||0;
+
+    const lockedProfit =
+      Number(d.lockedProfit)||0;
+
+    balanceEl.innerText =
+      "$"+balance.toFixed(2);
+
+    /* INVESTED */
+
+    if(invested>0){
+
+      capitalBox.style.display =
+        "block";
+
+      investedEl.innerText =
+        "$"+invested.toFixed(2);
+
+    }else{
+
+      capitalBox.style.display =
+        "none";
+    }
+
+    /* PROFIT */
+
+    if(
+      invested>0 ||
+      availableProfit>0 ||
+      lockedProfit>0
+    ){
+
+      profitBox.style.display =
+        "block";
+
+      profitEl.innerText =
+        "$"+availableProfit.toFixed(2);
+
+      lockedEl.innerText =
+        "Locked Profit: $"+
+        lockedProfit.toFixed(2);
+
+    }else{
+
+      profitBox.style.display =
+        "none";
+    }
+
+    /* PROFILE PHOTO */
+
+    if(d.photoURL){
+
+      avatar.src =
+        d.photoURL+"?t="+Date.now();
+    }
+
+  });
+
+  /* TRANSACTIONS */
+
+  const txQuery = query(
+    collection(db,"transactions"),
+    where("userId","==",user.uid)
+  );
+
+  onSnapshot(txQuery,(snapshot)=>{
+
+    historyEl.innerHTML="";
+
+    if(snapshot.empty){
+
+      historyEl.innerHTML=`
+      <div class="tx">
+        No transactions yet
+      </div>
+      `;
+
+      return;
+    }
+
+    snapshot.forEach((docItem)=>{
+
+      const d = docItem.data();
+
+      const color =
+        d.type==="deposit"
+        ? "lightgreen"
+        : "#ff6b6b";
+
+      historyEl.innerHTML += `
+
+      <div class="tx">
+
+        <div class="tx-top">
+
+          <b style="color:${color}">
+            ${d.type.toUpperCase()}
+          </b>
+
+          <span>
+            $${Number(d.amount).toFixed(2)}
+          </span>
+
+        </div>
+
+        <div class="small">
+          ${new Date(d.time).toLocaleString()}
+        </div>
+
+      </div>
+      `;
+    });
+  });
+
+  /* WITHDRAWALS */
+
+  const withdrawQuery = query(
+    collection(db,"withdrawals"),
+    where("userId","==",user.uid)
+  );
+
+  onSnapshot(withdrawQuery,(snapshot)=>{
+
+    withdrawEl.innerHTML="";
+
+    if(snapshot.empty){
+
+      withdrawEl.innerHTML=`
+      <div class="tx">
+        No withdraw requests
+      </div>
+      `;
+
+      return;
+    }
+
+    snapshot.forEach((docSnap)=>{
+
+      const d = docSnap.data();
+
+      const color =
+        d.status==="approved"
+        ? "lightgreen"
+        : d.status==="rejected"
+        ? "#ff6b6b"
+        : "orange";
+
+      withdrawEl.innerHTML += `
+
+      <div class="tx">
+
+        <div class="tx-top">
+
+          <b style="color:${color}">
+            ${d.status.toUpperCase()}
+          </b>
+
+          <span>
+            $${Number(d.amount).toFixed(2)}
+          </span>
+
+        </div>
+
+        <div class="small">
+          ${d.coin}
+        </div>
+
+        <div class="small">
+          ${new Date(d.time).toLocaleString()}
+        </div>
+
+      </div>
+      `;
+    });
+  });
+
+});
+
+/* PROFILE UPLOAD */
+
+window.openUpload = ()=>{
+  fileInput.click();
+};
+
+fileInput.onchange = async(e)=>{
+
+  const file = e.target.files[0];
+
+  if(!file || !currentUser) return;
+
+  const imgRef =
+    ref(storage,
+    `avatars/${currentUser.uid}`);
+
+  await uploadBytes(imgRef,file);
+
+  const url =
+    await getDownloadURL(imgRef);
+
+  await updateDoc(
+    doc(db,"users",currentUser.uid),
+    {
+      photoURL:url
+    }
+  );
+
+  avatar.src = url;
+};
+
+/* ACTIONS */
+
+window.goDeposit = ()=>{
+  location.href="deposit.html";
+};
+
+window.goWithdraw = ()=>{
+  location.href="withdraw.html";
+};
+
+window.copyRef = async () => {
+  const text = document.getElementById("ref").value;
+
+  try {
+    // modern method
+    await navigator.clipboard.writeText(text);
+    alert("Copied successfully");
+  } catch (err) {
+
+    // fallback method (VERY IMPORTANT for Android)
+    const input = document.createElement("input");
+    document.body.appendChild(input);
+    input.value = text;
+    input.select();
+    document.execCommand("copy");
+    document.body.removeChild(input);
+
+    alert("Copied successfully");
+  }
+};
+
+window.logout = ()=>{
+
+  signOut(auth);
+
+  location.href="login.html";
+};
+
+</script>
+
+</body>
+  </html>
