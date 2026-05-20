@@ -1,0 +1,259 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Withdraw</title><style>
+body{
+  background:#0b0f1a;
+  color:white;
+  font-family:Arial;
+  text-align:center;
+  padding-top:100px;
+}
+
+input{
+  padding:10px;
+  width:250px;
+  margin:10px;
+}
+
+button{
+  padding:10px 20px;
+  background:#ff4d4d;
+  border:none;
+  cursor:pointer;
+  color:white;
+}
+
+  /* ===== TRANSLATE CONTAINER ===== */
+.translate-box{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#111827;
+  padding:6px 10px;
+  border-radius:8px;
+  border:1px solid #1f2937;
+}
+
+/* ICON */
+.translate-box i{
+  color:#00ff9d;
+  font-size:14px;
+}
+
+/* DROPDOWN */
+.goog-te-combo{
+  background:transparent !important;
+  color:#00ff9d !important;
+  border:none !important;
+  font-size:13px;
+  outline:none;
+  cursor:pointer;
+}
+
+/* REMOVE GOOGLE BRANDING */
+.goog-logo-link,
+.goog-te-gadget span{
+  display:none !important;
+}
+
+.goog-te-gadget{
+  color:transparent !important;
+}
+
+/* HIDE TOP BAR */
+.goog-te-banner-frame.skiptranslate{
+  display:none !important;
+}
+
+body{
+  top:0px !important;
+}
+
+/* SMOOTH HOVER */
+.translate-box:hover{
+  border-color:#00ff9d;
+  box-shadow:0 0 10px rgba(0,255,157,0.2);
+  }
+</style></head><body><h2>Withdraw</h2>
+
+<select id="coin">
+  <option value="">Select Coin</option>
+  <option value="BTC">Bitcoin (BTC)</option>
+  <option value="USDT">Tether (USDT)</option>
+  <option value="ETH">Ethereum (ETH)</option>
+  <option value="XRP">Ledger (XRP)</option>
+</select><br>
+
+<input type="text" id="wallet" placeholder="Enter wallet address"><br>
+
+<input type="number" id="amount" placeholder="Enter amount"><br>
+
+<button id="withdrawBtn" onclick="withdraw()">Confirm Withdraw</button>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyDGsQ3Q7JHVvNlKAQi3l5HSZBZrP_fVoBk",
+  authDomain: "stargicinvestment.firebaseapp.com",
+  projectId: "stargicinvestment",
+  storageBucket: "stargicinvestment.appspot.com",
+  messagingSenderId: "1053305294931",
+  appId: "1:1053305294931:web:87cba3260a83030e56f6a6"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// 🔐 AUTH CHECK
+onAuthStateChanged(auth,(user)=>{
+  if(!user){
+    location.href = "login.html";
+  }
+});
+
+// 💰 WITHDRAW FUNCTION
+let isProcessing = false;
+
+window.withdraw = async function(){
+
+  if(isProcessing) return;
+  isProcessing = true;
+
+  const btn = document.getElementById("withdrawBtn");
+  btn.disabled = true;
+  btn.innerText = "Processing...";
+
+  try{
+
+    const user = auth.currentUser;
+
+    if(!user){
+      alert("Login first");
+      throw "stop";
+    }
+
+    const coin = document.getElementById("coin").value;
+    const wallet = document.getElementById("wallet").value.trim();
+    const amount = Number(document.getElementById("amount").value);
+
+    if(!coin){
+      alert("Select coin");
+      throw "stop";
+    }
+
+    if(!wallet || wallet.length < 10){
+      alert("Enter valid wallet address");
+      throw "stop";
+    }
+
+    if(!amount || amount <= 0){
+      alert("Enter valid amount");
+      throw "stop";
+    }
+
+    const userRef = doc(db,"users",user.uid);
+    const snap = await getDoc(userRef);
+
+    if(!snap.exists()){
+      alert("User not found");
+      throw "stop";
+    }
+
+    const data = snap.data();
+
+    if(data.admin){
+      alert("Admin cannot withdraw");
+      throw "stop";
+    }
+
+    let availableProfit = Number(data.availableProfit) || 0;
+
+    if(amount > availableProfit){
+      alert("Insufficient profit");
+      throw "stop";
+    }
+
+    if(amount < 10){
+      alert("Minimum withdraw is $10");
+      throw "stop";
+    }
+    
+
+const q = query(
+  collection(db,"withdrawals"),
+  where("userId","==",user.uid),
+  where("status","==","pending")
+);
+
+const existing = await getDocs(q);
+
+if(!existing.empty){
+  alert("You already have a pending request");
+  throw "stop";
+  }
+    
+
+    await addDoc(collection(db, "withdrawals"), {
+      userId: user.uid,
+      coin,
+      wallet,
+      amount,
+      status: "pending",
+      time: Date.now()
+    });
+
+    alert("Request sent. Waiting for admin approval.");
+
+    document.getElementById("wallet").value = "";
+    document.getElementById("amount").value = "";
+    document.getElementById("coin").value = "";
+
+  }
+  catch(err){
+    if(err !== "stop"){
+      console.error(err);
+      alert("Error occurred. Try again.");
+    }
+  }
+  finally{
+    btn.disabled = false;
+    btn.innerText = "Confirm Withdraw";
+    isProcessing = false;
+  }
+};
+ </script>
+
+  <script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+</script>
+
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+  </html>
