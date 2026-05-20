@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0b0f1a;
+  color:white;
+}
+
+.header{
+  padding:15px;
+  background:#111827;
+  display:flex;
+  justify-content:space-between;
+}
+
+.container{
+  padding:15px;
+}
+
+.card{
+  background:#1f2937;
+  padding:15px;
+  margin-bottom:10px;
+  border-radius:10px;
+}
+
+button{
+  padding:8px 12px;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+  margin-top:5px;
+}
+
+.add{background:#22c55e;}
+.delete{background:#ef4444;}
+
+input{
+  padding:8px;
+  border-radius:5px;
+  border:none;
+  width:120px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h2>Admin Dashboard</h2>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<div class="container">
+
+  <div id="status">Checking admin...</div>
+
+  <h3>All Users</h3>
+  <div id="usersList"></div>
+
+  <!-- ✅ ADD THIS PART -->
+  <h3>Withdraw Requests</h3>
+  <div id="withdrawList"></div>
+
+</div>
+
+<script type="module">
+
+  console.log("Admin dashboard loaded");
+  
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import { 
+  getFirestore, doc, getDoc, collection, getDocs, 
+  updateDoc, deleteDoc, addDoc, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyDGsQ3Q7JHVvNlKAQi3l5HSZBZrP_fVoBk",
+  authDomain: "stargicinvestment.firebaseapp.com",
+  projectId: "stargicinvestment",
+  storageBucket: "stargicinvestment.appspot.com",
+  messagingSenderId: "1053305294931",
+  appId: "1:1053305294931:web:87cba3260a83030e56f6a6"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+  function loadWithdrawals(){
+
+  const list = document.getElementById("withdrawList");
+
+  onSnapshot(collection(db,"withdrawals"), (snapshot)=>{
+
+    let html = "";
+
+    snapshot.forEach((docSnap)=>{
+
+      const d = docSnap.data();
+      const id = docSnap.id;
+
+      html += `
+      <div class="card">
+        <p><b>User:</b> ${d.userId}</p>
+        <p><b>Amount:</b> $${d.amount}</p>
+        <p><b>Coin:</b> ${d.coin}</p>
+
+        <p>
+          <b>Wallet:</b><br>
+          <span style="font-size:12px;color:#aaa;">
+            ${d.wallet}
+          </span>
+        </p>
+
+        <button onclick="copyWallet('${d.wallet}')">Copy</button>
+
+        <p>Status: 
+  <span style="
+    color: ${
+      d.status === "approved" ? "lightgreen" :
+      d.status === "rejected" ? "red" : "orange"
+    };
+  ">
+    ${d.status}
+  </span>
+</p>
+
+        ${d.status === "pending" ? `
+          <button onclick="approveWithdraw('${id}','${d.userId}',${d.amount})">Approve</button>
+          <button onclick="rejectWithdraw('${id}')">Reject</button>
+        ` : ""}
+      </div>
+      `;
+    });
+
+    list.innerHTML = html;
+  });
+  }
+
+
+// ✅ ADMIN CHECK
+onAuthStateChanged(auth, async (user) => {
+
+  if(!user){
+    document.getElementById("status").innerText = "Not logged in";
+    return;
+  }
+
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+
+  if(!snap.exists()){
+    document.getElementById("status").innerText = "User data not found";
+    return;
+  }
+
+  const data = snap.data();
+
+  if(!data.admin){
+    document.getElementById("status").innerText = "Access Denied ❌";
+    return;
+  }
+  // after admin check
+loadWithdrawals();
+
+  document.getElementById("status").innerText = "Welcome Admin ✅";
+
+  loadUsers();
+});
+
+async function addBalance(userId, amount) {
+
+  const userRef = doc(db, "users", userId);
+  const snap = await getDoc(userRef);
+
+  if(!snap.exists()) {
+    alert("User not found");
+    return;
+  }
+
+  const data = snap.data();
+
+  let newTotal = (Number(data.invested) || 0) + amount;
+
+  let newPlan = "Basic";
+
+  if(newTotal >= 100000){
+    newPlan = "VIP";
+  }else if(newTotal >= 50000){
+    newPlan = "Premium";
+  }else if(newTotal >= 10000){
+    newPlan = "Elite";
+  }else if(newTotal >= 2000){
+    newPlan = "Silver";
+  }
+
+  await updateDoc(userRef,{
+    balance: (Number(data.balance) || 0) + amount,
+    invested: newTotal,
+    plan: newPlan,
+
+    // 🔥 IMPORTANT: keep mining stable
+    lastUpdate: Date.now(),
+    profitStart: data.profitStart || Date.now(),
+    lockedProfit: Number(data.lockedProfit) || 0,
+    availableProfit: Number(data.availableProfit) || 0
+  });
+
+  await addDoc(collection(db,"transactions"),{
+    userId,
+    type: "deposit",
+    amount,
+    time: Date.now()
+  });
+}
+
+
+
+// ✅ LOAD USERS
+function loadUsers(){
+
+  const list = document.getElementById("usersList");
+
+  onSnapshot(collection(db,"users"), (snapshot)=>{
+
+    let html = "";
+
+    snapshot.forEach((docSnap)=>{
+
+      const u = docSnap.data();
+      const id = docSnap.id;
+
+      html += `
+        <div class="card">
+          <p><b>Email:</b> ${u.email || "N/A"}</p>
+          <p><b>Invested:</b> $${Number(u.invested || 0).toFixed(2)}</p>
+          <p><b>Available Profit:</b> $${Number(u.availableProfit || 0).toFixed(2)}</p>
+          <p><b>Locked Profit:</b> $${Number(u.lockedProfit || 0).toFixed(2)}</p>
+          <p><b>Plan:</b> ${u.plan || "None"}</p>
+
+          <input type="number" id="bal-${id}" placeholder="Add amount">
+
+          <button class="add" onclick="updateBalance('${id}')">Add Balance</button>
+          <button class="delete" onclick="deleteUser('${id}')">Delete</button>
+        </div>
+      `;
+    });
+
+    list.innerHTML = html || "<p>No users found</p>";
+
+  }, (error)=>{
+    console.log("Users error:", error);
+  });
+}
+
+
+// ✅ BUTTON HANDLER
+let processing = {};
+
+window.updateBalance = async function(id){
+
+  if(processing[id]) return; // 🔥 block double click
+  processing[id] = true;
+
+  const input = document.getElementById(`bal-${id}`);
+  const amount = Number(input.value);
+
+  if(isNaN(amount) || amount <= 0){
+    alert("Enter valid amount");
+    processing[id] = false;
+    return;
+  }
+
+  await addBalance(id, amount);
+
+  alert("Balance added successfully");
+
+  input.value = "";
+
+  processing[id] = false;
+
+  loadUsers();
+}
+
+
+// ✅ DELETE USER
+window.deleteUser = async function(id){
+
+  if(!confirm("Delete user?")) return;
+
+  await deleteDoc(doc(db,"users",id));
+
+  alert("User deleted");
+  loadUsers();
+}
+
+
+// ✅ LOGOUT
+window.logout = function(){
+  signOut(auth);
+  location.href = "login.html";
+}
+     let approving = {};
+  window.approveWithdraw = async function(id, userId, amount){
+
+  if(approving[id]) return; // 🚫 block double click
+  approving[id] = true;
+
+  const userRef = doc(db,"users",userId);
+  const withdrawRef = doc(db,"withdrawals",id);
+
+  const snap = await getDoc(userRef);
+  const data = snap.data();
+
+    if(data.admin){
+  alert("Cannot withdraw from admin account");
+  approving[id] = false; // 🔥 ADD THIS
+  return;
+    }
+
+  let availableProfit = Number(data.availableProfit) || 0;
+
+  if(amount > availableProfit || availableProfit <= 0){
+    alert("Insufficient or already used balance");
+    approving[id] = false;
+    return;
+  }
+
+  await updateDoc(userRef,{
+    availableProfit: availableProfit - amount
+  });
+
+  await updateDoc(withdrawRef,{
+    status: "approved"
+  });
+
+  await addDoc(collection(db,"transactions"),{
+    userId,
+    type: "withdraw",
+    amount,
+    time: Date.now()
+  });
+
+  alert("Approved");
+
+  approving[id] = false;
+};
+
+  
+  window.rejectWithdraw = async function(id){
+
+  const withdrawRef = doc(db,"withdrawals",id);
+
+  await updateDoc(withdrawRef,{
+    status: "rejected"
+  });
+
+  alert("Rejected");
+
+}
+  window.copyWallet = function(address){
+  navigator.clipboard.writeText(address);
+  alert("Copied!");
+    }
+
+</script>
+
+</body>
+  </html>
