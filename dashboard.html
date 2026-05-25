@@ -489,77 +489,99 @@ async function loadPrices(){
 loadPrices();
 setInterval(loadPrices,30000);
 
-/* MINING */
+
+/* MINING SYSTEM */
 
 async function runMining(userRef){
 
-  const snap = await getDoc(userRef);
+  try{
 
-  if(!snap.exists()) return;
+    const snap = await getDoc(userRef);
 
-  const data = snap.data();
+    if(!snap.exists()) return;
 
-  let invested =
-    Number(data.invested)||0;
+    const data = snap.data();
 
-  if(invested<=0) return;
+    const invested =
+      Number(data.invested) || 0;
 
-  if(!data.plan) return;
+    if(invested <= 0) return;
 
-  const plan = plans[data.plan];
+    const selectedPlan =
+      data.plan;
 
-  if(!plan) return;
+    if(!selectedPlan) return;
 
-  let now = Date.now();
+    const plan =
+      plans[selectedPlan];
 
-  let last =
-    Number(data.lastUpdate)||now;
+    if(!plan) return;
 
-  let lockedProfit =
-    Number(data.lockedProfit)||0;
+    const now = Date.now();
 
-  let profitStart =
-    Number(data.profitStart)||now;
+    let lastUpdate =
+      Number(data.lastUpdate) || now;
 
-  let days =
-    (now-profitStart)/(1000*60*60*24);
+    let lockedProfit =
+      Number(data.lockedProfit) || 0;
 
-  /* UNLOCK */
+    let availableProfit =
+      Number(data.availableProfit) || 0;
 
-  if(days>=7 && lockedProfit>0){
+    let profitStart =
+      Number(data.profitStart) || now;
+
+    /* HOURS PASSED */
+
+    const hoursPassed =
+      (now - lastUpdate) / (1000 * 60 * 60);
+
+    if(hoursPassed <= 0) return;
+
+    /* LIVE PROFIT */
+
+    const earned =
+      invested *
+      plan.rate *
+      (hoursPassed / 24);
+
+    /* ADD LOCKED PROFIT */
+
+    lockedProfit += earned;
+
+    /* CHECK 7 DAYS */
+
+    const sevenDays =
+      7 * 24 * 60 * 60 * 1000;
+
+    if((now - profitStart) >= sevenDays){
+
+      availableProfit += lockedProfit;
+
+      lockedProfit = 0;
+
+      profitStart = now;
+    }
+
+    /* UPDATE FIREBASE */
 
     await updateDoc(userRef,{
 
-      availableProfit:
-        (Number(data.availableProfit)||0)
-        + lockedProfit,
-
-      lockedProfit:0,
-      profitStart:Date.now()
+      lockedProfit: lockedProfit,
+      availableProfit: availableProfit,
+      lastUpdate: now,
+      profitStart: profitStart
 
     });
 
-    return;
+  }catch(error){
+
+    console.log("Mining Error:", error);
+
   }
 
-  let hours =
-    (now-last)/(1000*60*60);
-
-  let earned =
-    invested*plan.rate*(hours/24);
-
-  if(!isFinite(earned)||earned<=0) return;
-
-  await updateDoc(userRef,{
-
-    lockedProfit:
-      (Number(data.lockedProfit)||0)
-      + earned,
-
-    lastUpdate:now
-
-  });
 }
+
 
 /* START MINING */
 
