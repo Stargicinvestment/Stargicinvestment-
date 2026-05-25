@@ -25103,70 +25103,119 @@ nr599erV15RyP8ZW0S6Zf9oCA0rOMYn7yNfvPi61lyV0Kfy7ncdx/R+fISM7cycV+buBZQYcxj1k
   </div>
 </div>
 
-  <!-- LIVE CRYPTO TICKER -->
+  <!-- CRYPTO TICKER -->
 
 <div style="
 width:100%;
 overflow:hidden;
-background:#0f172a;
+background:#081120;
 padding:14px 0;
+position:relative;
+white-space:nowrap;
 border-top:1px solid rgba(255,255,255,0.08);
 border-bottom:1px solid rgba(255,255,255,0.08);
-white-space:nowrap;
-position:relative;
 ">
 
-<div id="tickerTrack" style="
-display:inline-flex;
-gap:50px;
+<div id="ticker" style="
+display:flex;
+width:max-content;
 align-items:center;
-padding-left:100%;
-animation:tickerMove 28s linear infinite;
+gap:50px;
+animation:scrollTicker 35s linear infinite;
 ">
 
+<!-- FIRST SET -->
+
+<div style="display:flex;gap:50px;align-items:center;">
+
 <div style="display:flex;align-items:center;gap:8px;color:white;">
-<img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" style="width:24px;height:24px;">
+<img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" style="width:24px;">
 <b>BTC</b>
-<span id="btcPrice">$0</span>
+<span id="btc">$0</span>
 </div>
 
 <div style="display:flex;align-items:center;gap:8px;color:white;">
-<img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" style="width:24px;height:24px;">
+<img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" style="width:24px;">
 <b>ETH</b>
-<span id="ethPrice">$0</span>
+<span id="eth">$0</span>
 </div>
 
 <div style="display:flex;align-items:center;gap:8px;color:white;">
-<img src="https://cryptologos.cc/logos/tether-usdt-logo.png" style="width:24px;height:24px;">
+<img src="https://cryptologos.cc/logos/tether-usdt-logo.png" style="width:24px;">
 <b>USDT</b>
-<span id="usdtPrice">$0</span>
+<span id="usdt">$0</span>
 </div>
 
 <div style="display:flex;align-items:center;gap:8px;color:white;">
-<img src="https://cryptologos.cc/logos/xrp-xrp-logo.png" style="width:24px;height:24px;">
+<img src="https://cryptologos.cc/logos/xrp-xrp-logo.png" style="width:24px;">
 <b>XRP</b>
-<span id="xrpPrice">$0</span>
+<span id="xrp">$0</span>
 </div>
 
 <div style="display:flex;align-items:center;gap:8px;color:white;">
-<img src="https://cryptologos.cc/logos/solana-sol-logo.png" style="width:24px;height:24px;">
+<img src="https://cryptologos.cc/logos/solana-sol-logo.png" style="width:24px;">
 <b>SOL</b>
-<span id="solPrice">$0</span>
+<span id="sol">$0</span>
+</div>
+
+</div>
+
+<!-- DUPLICATE SET FOR SMOOTH LOOP -->
+
+<div style="display:flex;gap:50px;align-items:center;">
+
+<div style="display:flex;align-items:center;gap:8px;color:white;">
+<img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" style="width:24px;">
+<b>BTC</b>
+<span id="btc2">$0</span>
+</div>
+
+<div style="display:flex;align-items:center;gap:8px;color:white;">
+<img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" style="width:24px;">
+<b>ETH</b>
+<span id="eth2">$0</span>
+</div>
+
+<div style="display:flex;align-items:center;gap:8px;color:white;">
+<img src="https://cryptologos.cc/logos/tether-usdt-logo.png" style="width:24px;">
+<b>USDT</b>
+<span id="usdt2">$0</span>
+</div>
+
+<div style="display:flex;align-items:center;gap:8px;color:white;">
+<img src="https://cryptologos.cc/logos/xrp-xrp-logo.png" style="width:24px;">
+<b>XRP</b>
+<span id="xrp2">$0</span>
+</div>
+
+<div style="display:flex;align-items:center;gap:8px;color:white;">
+<img src="https://cryptologos.cc/logos/solana-sol-logo.png" style="width:24px;">
+<b>SOL</b>
+<span id="sol2">$0</span>
 </div>
 
 </div>
 
 </div>
-  
 
-@keyframes tickerMove{
+</div>
+
+<style>
+
+@keyframes scrollTicker{
+
 0%{
 transform:translateX(0);
 }
+
 100%{
-transform:translateX(-100%);
+transform:translateX(-50%);
 }
+
 }
+
+</style>
+
 
 
 <!-- HOW IT WORKS -->
@@ -25243,48 +25292,47 @@ transform:translateX(-100%);
     <span><span class="dot"></span>All Systems Operational</span>
   </div>
 </footer>
-
 <script>
 
-async function loadTickerPrices(){
+async function loadCryptoPrices(){
 
 try{
 
-const response = await fetch(
+const res = await fetch(
 "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether,ripple,solana&vs_currencies=usd"
 );
 
-const data = await response.json();
+const data = await res.json();
 
-document.getElementById("btcPrice").innerText =
-"$" + data.bitcoin.usd.toLocaleString();
+const prices = {
+btc: "$" + data.bitcoin.usd.toLocaleString(),
+eth: "$" + data.ethereum.usd.toLocaleString(),
+usdt: "$" + data.tether.usd.toLocaleString(),
+xrp: "$" + data.ripple.usd.toLocaleString(),
+sol: "$" + data.solana.usd.toLocaleString()
+};
 
-document.getElementById("ethPrice").innerText =
-"$" + data.ethereum.usd.toLocaleString();
+for(const key in prices){
 
-document.getElementById("usdtPrice").innerText =
-"$" + data.tether.usd.toLocaleString();
+document.getElementById(key).innerText = prices[key];
 
-document.getElementById("xrpPrice").innerText =
-"$" + data.ripple.usd.toLocaleString();
+document.getElementById(key+"2").innerText = prices[key];
 
-document.getElementById("solPrice").innerText =
-"$" + data.solana.usd.toLocaleString();
+}
 
-}catch(error){
+}catch(err){
 
-console.log(error);
+console.log("Price error:", err);
 
 }
 
 }
 
-loadTickerPrices();
+loadCryptoPrices();
 
-setInterval(loadTickerPrices,30000);
+setInterval(loadCryptoPrices,30000);
 
 </script>
-
   
 <script>
 
