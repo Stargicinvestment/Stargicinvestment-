@@ -300,16 +300,21 @@ window.register = async function(){
 
 
     // ✅ SAVE USER
-    await setDoc(doc(db,"users",user.uid),{
-      name,
-      email,
-      referral: referral || null,
-      balance:0,
-      availableProfit:0,
-      plan:"starter",
-      admin:false,
-      createdAt: Date.now()
-    });
+await setDoc(doc(db,"users",user.uid),{
+  name,
+  email,
+  referral: referral || null,
+
+  balance: 0,
+  invested: 0,
+  availableProfit: 0,
+  lockedProfit: 0,
+
+  plan: "starter",
+  referrals: 0,
+
+  createdAt: Date.now()
+});
 
     alert("Account created successfully!");
 
