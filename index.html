@@ -35,6 +35,65 @@ footer{background:#000;color:#fff;padding:50px 20px;text-align:center}
 .slide img{height:300px}
 .caption{left:15px;right:15px;bottom:15px}
 }
+  .hero-slider{
+height:100vh;
+position:relative;
+overflow:hidden;
+}
+
+.slide{
+position:absolute;
+inset:0;
+opacity:0;
+transition:1s;
+}
+
+.slide.active{
+opacity:1;
+}
+
+.slide img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+.overlay{
+position:absolute;
+inset:0;
+background:rgba(0,0,0,.45);
+}
+
+.content{
+position:absolute;
+left:30px;
+bottom:120px;
+color:white;
+z-index:2;
+}
+
+.content h1{
+font-size:55px;
+font-weight:900;
+text-transform:uppercase;
+}
+
+.content p{
+font-size:18px;
+color:#ff0000;
+font-weight:bold;
+margin-bottom:10px;
+}
+
+.btn{
+display:inline-block;
+margin-top:20px;
+padding:18px 40px;
+background:white;
+color:black;
+font-weight:bold;
+text-decoration:none;
+  }
 </style>
 </head>
 <body>
@@ -57,12 +116,24 @@ footer{background:#000;color:#fff;padding:50px 20px;text-align:center}
 <div class="slider-wrap">
 <div class="slides" id="slides">
 
-<div class="slide"><img src="images/slide1.jpg"></div>
-<div class="slide"><img src="images/slide2.jpg"></div>
-<div class="slide"><img src="images/slide3.jpg"></div>
-<div class="slide"><img src="images/slide4.jpg"></div>
-<div class="slide"><img src="images/slide5.jpg"></div>
+<div class="slide active">
+    <img src="images/slide1.jpg">
+</div>
 
+<div class="slide">
+    <img src="images/slide2.jpg">
+</div>
+
+<div class="slide">
+    <img src="images/slide3.jpg">
+</div>
+
+<div class="slide">
+    <img src="images/slide4.jpg">
+</div>
+
+<div class="slide">
+    <img src="images/slide5.jpg">
 </div>
 
 <div class="caption">
@@ -105,23 +176,31 @@ footer{background:#000;color:#fff;padding:50px 20px;text-align:center}
 </footer>
 
 <script>
-const images=[
-'images/slide1.jpg',
-'images/slide2.jpg',
-'images/slide3.jpg',
-'images/slide4.jpg',
-'images/slide5.jpg'
-];
-images.forEach(src=>{let i=new Image();i.src=src;});
+let current = 0;
 
-let current=0;
-const slides=document.getElementById('slides');
-const total=document.querySelectorAll('.slide').length;
+const slides = document.querySelectorAll('.slide');
 
-setInterval(()=>{
-current=(current+1)%total;
-slides.style.transform='translateX(-'+(current*100)+'%)';
-},4000);
+function showSlide(index){
+
+slides.forEach(slide=>{
+slide.classList.remove('active');
+});
+
+slides[index].classList.add('active');
+}
+
+function nextSlide(){
+
+current++;
+
+if(current >= slides.length){
+current = 0;
+}
+
+showSlide(current);
+}
+
+setInterval(nextSlide,4000);
 </script>
 
 </body>
